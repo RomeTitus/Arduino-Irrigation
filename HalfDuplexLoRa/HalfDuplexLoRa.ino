@@ -33,6 +33,7 @@ void setup() {
   LoRa.setSpreadingFactor(spreadingFactor);           // ranges from 6-12,default 7 see API docs
     lcd.setCursor(0,1);
     lcd.print("LoRa Spread: " + String(spreadingFactor));
+    Serial.println("LoRa Spread: " + String(spreadingFactor));
 }
 void loop() {
   // Run only when you receive data for serial port:

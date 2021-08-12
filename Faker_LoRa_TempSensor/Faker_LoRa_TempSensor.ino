@@ -4,6 +4,7 @@
 #include <DallasTemperature.h>
 
 #define tempSensor 3 //On digital pin 3
+String header = "abbb", key = "13", controllerKey = "29";
 OneWire oneWire_in(tempSensor);
 DallasTemperature coolerRoomSensor(&oneWire_in);
 
@@ -45,7 +46,7 @@ void loop() {
     float temp = coolerRoomSensor.getTempCByIndex(0);
     if(temp > oldTemp1 + 0.5 || temp < oldTemp1 -0.5){
       oldTemp1 = temp;
-      readString = "►abcd29813" + String(temp) + "◄";
+      readString = "►" + header +controllerKey +"8" +key + String(temp) + "◄";
       Serial.println(readString);
     }
     lastSendTime = millis();            // timestamp the message
