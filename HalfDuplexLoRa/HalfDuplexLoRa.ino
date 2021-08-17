@@ -1,17 +1,11 @@
+//https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md
 #include <SPI.h>              // include libraries
 #include <LoRa.h>
 #include <LiquidCrystal.h>
-String forwarding[5];
-String helpText = "Help Commands:\nREPEAT [01,02] [03,04]\tThere can be up to 5 diffrent repeater setup";
 const int nssPin = 10, resetPin = 6, irqPin = 2;          // LoRa radio chip select, LoRa radio reset, must be a hardware interrupt pin  [2,3]
 String outgoing;              // outgoing message
-//const int rs = 3, en = 4, d4 = 5, d5 = 6, d6 = 7, d7 = 8;
 const int rs = 8, en = 7, d4 = 5, d5 = 4, d6 = 3, d7 = 6;
-int spreadingFactor = 12;
-
-byte msgCount = 0; 
-long lastSendTime = 0;        // last send time
-int interval = 2000;          // interval between sends
+int spreadingFactor = 12, txPower = 20;
 
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
@@ -24,6 +18,7 @@ void setup() {
   
   // override the default CS, reset, and IRQ pins (optional)
   LoRa.setPins(nssPin, resetPin, irqPin);// set CS, reset, IRQ pin
+  LoRa.setTxPower(txPower);
   if (!LoRa.begin(433E6)) {             // initialize ratio at 433 MHz
     Serial.println("404 LoRa init failed. Check your connections.");
     lcd.setCursor(0,1);
@@ -48,22 +43,8 @@ void loop() {
     } 
   }
 
-   if (readString.length() >0) {
-      
-     // if(readString.substring(0,6).equalsIgnoreCase("repeat")){
-     //   setForwardingKeys(readString.substring(6));
-     //}else if(readString.substring(0,1) == "?" || readString.substring(0,4).equalsIgnoreCase("help")){
-     //   Serial.println(helpText);
-     //}
-     //else{
-        //Serial.println("success" + "RSSI: " + String(LoRa.packetRssi()) + "Snr: " + String(LoRa.packetSnr()));
-     //   sendMessage(readString);
-     //}
-     
-    //digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+   if (readString.length() >0) {  
     sendMessage(readString);                       // wait for a second
-    //digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-     
    }
 
   onReceive(LoRa.parsePacket());
@@ -94,13 +75,7 @@ void onReceive(int packetSize) {
     Serial.println("404: message length does not match Header length");
     return;                             // skip rest of function
   }
-
-  //String repeatedMessage = repeatRequired(incoming);
-  //if(repeatedMessage != incoming){
-  //  delay(50);
-  //  sendMessage(repeatedMessage);
-  //  repeatedMessage = "LoRa Repeated: " + repeatedMessage + "←";
-  //}
+  
   Serial.println(incoming + "RSSI: " + String(LoRa.packetRssi()) + "Snr: " + String(LoRa.packetSnr()));
   lcd.clear();
   lcd.setCursor(0,0);
@@ -109,58 +84,3 @@ void onReceive(int packetSize) {
   lcd.print("RSSI" + String(LoRa.packetRssi()) + "Snr" + String(LoRa.packetSnr()));
   
 }
-
-/*
-String repeatRequired(String outgoingMessage){
-  String key = outgoingMessage.substring(5,7);
-  String NewKey = "";
-  for (int i = 0; i <= 5; i++) {
-    String forwardKeys = forwarding[i];
-    int keyIndex = forwardKeys.indexOf(key);
-    if(keyIndex >= 0){
-      i = 6;
-      int splitIndex = forwardKeys.indexOf(',');
-      if(keyIndex<=splitIndex){  
-        NewKey = forwardKeys.substring(splitIndex+1);
-      }else{
-        NewKey = forwardKeys.substring(0, splitIndex);
-      }
-    }
-  }
-  
-  Serial.println("KEY: " + key);
-  if(NewKey != ""){    
-    outgoingMessage.setCharAt(5, NewKey.charAt(0));
-    outgoingMessage.setCharAt(6, NewKey.charAt(1));
-  }
-  return outgoingMessage;
-}
-
-void setForwardingKeys(String repeat){
-    repeat.replace(" ", "");
-    //Clear the Array
-    for (int i = 0; i <= 5; i++) {
-      forwarding[i] = "";
-    }
-    
-    char char_array[0];
-    // Copy it over 
-    repeat.toCharArray(char_array, repeat.length() + 1);
-    String repeatIds = "";
-    int index = 0;
-     for (int i = 0; i <= strlen(char_array); i++) {
-      if(char_array[i] != '[' && char_array[i] != ']'){
-        repeatIds += char_array[i];
-      }else if(char_array[i] == ']' && repeatIds.length()>0){
-        forwarding[index] = repeatIds;
-        repeatIds = "";
-        index += 1;
-      }  
-    }
-    if(index == 0){
-      Serial.println("404 Incorrect Parameters : " + repeat);
-    }else{
-      Serial.println("OK");
-    }
-}
-*/
