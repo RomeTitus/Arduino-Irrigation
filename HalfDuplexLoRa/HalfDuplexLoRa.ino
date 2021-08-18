@@ -4,7 +4,7 @@
 #include <LiquidCrystal.h>
 const int nssPin = 10, resetPin = 6, irqPin = 2;          // LoRa radio chip select, LoRa radio reset, must be a hardware interrupt pin  [2,3]
 String outgoing;              // outgoing message
-const int rs = 8, en = 7, d4 = 5, d5 = 4, d6 = 3, d7 = 6;
+const int rs = 3, en = 4, d4 = 5, d5 = 6, d6 = 7, d7 = 8;
 int spreadingFactor = 12, txPower = 20;
 
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
@@ -18,13 +18,14 @@ void setup() {
   
   // override the default CS, reset, and IRQ pins (optional)
   LoRa.setPins(nssPin, resetPin, irqPin);// set CS, reset, IRQ pin
-  LoRa.setTxPower(txPower);
+  
   if (!LoRa.begin(433E6)) {             // initialize ratio at 433 MHz
     Serial.println("404 LoRa init failed. Check your connections.");
     lcd.setCursor(0,1);
     lcd.print("LoRa failed! :(");
     while (true);                       // if failed, do nothing
   }
+  LoRa.setTxPower(txPower);
   LoRa.setSpreadingFactor(spreadingFactor);           // ranges from 6-12,default 7 see API docs
     lcd.setCursor(0,1);
     lcd.print("LoRa Spread: " + String(spreadingFactor));
