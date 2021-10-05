@@ -5,7 +5,7 @@
 const int nssPin = 10, resetPin = 6, irqPin = 2;          // LoRa radio chip select, LoRa radio reset, must be a hardware interrupt pin  [2,3]
 String outgoing;              // outgoing message
 const int rs = 3, en = 4, d4 = 5, d5 = 6, d6 = 7, d7 = 8;
-int spreadingFactor = 12, txPower = 20;
+int spreadingFactor = 12, txPower = 18;
 
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
@@ -44,7 +44,7 @@ void loop() {
     } 
   }
 
-   if (readString.length() >0) {  
+   if (readString.length() >0) {
     sendMessage(readString);                       // wait for a second
    }
 
